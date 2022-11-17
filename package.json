@@ -19,7 +19,9 @@
   },
   "homepage": "https://github.com/Won-t-Back-Down/memeAPI#readme",
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "sequelize": "^6.25.3",
+    "sqlite3": "^5.1.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"

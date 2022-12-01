@@ -3,4 +3,3 @@ const {database} = require('../db');
 const {User, Meme} = require('../models/index');
 const {memes} = require("./memeData");
 const {users} = require("./userData");
-//Not needed for now

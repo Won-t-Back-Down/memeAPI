@@ -8,19 +8,19 @@ const memes = [
   {
       id: 2,
       caption: "meme2",
-      tags: "meme",
+      tags: "classic, hilarious",
       image: "some picture"
   },
   {
       id: 3,
       caption: "meme3",
-      tags: "meme3",
+      tags: "funny",
       image: "a picture"
   },
   {
       id: 4, 
       caption: "meme4",
-      tags: "meme4",
+      tags: "absolutely bonkers",
       image: "another picture"
   }
 ];

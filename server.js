@@ -28,7 +28,7 @@ app.get('/memes/:id', async (req, res) => {
   res.json(singleMeme);
 })
 //Edit a meme
-app.put('/memes:/id', async (req, res) => {
+app.put('/memes/:id', async (req, res) => {
   let editMeme = await Meme.update(req.body,
     {where: {id: req.params.id}});
   res.send("Updated.");
@@ -67,6 +67,10 @@ app.get("/memes", async (req, res, next) => {
 // GET route for single user
 
 // POST route to create a meme
+app.post("/memes", async (req, res) => {
+  let newMeme = await Meme.create(req.body);
+  res.send(await Meme.findAll());
+})
 
 // POST route to create/register a user
 

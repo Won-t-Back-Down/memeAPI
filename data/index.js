@@ -3,6 +3,9 @@ const {User, Meme} = require('../models/index');
 const {memes} = require("./memeData");
 const {users} = require("./userData");
 
+Meme.belongsTo(User)
+User.hasMany(Meme)
+
 let seed = async () => {
     await database.sync({force:true});
 

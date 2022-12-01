@@ -23,18 +23,18 @@ app.get("/users", async (req, res) => {
   res.send(users)
 });
 //View a meme
-router.get('/:id', async (req, res) => {
+app.get('/:id', async (req, res) => {
   const singleMeme = await Meme.findByPk(req.params.id);
   res.json(singleMeme);
 })
 //Edit a meme
-router.put(':/id', async (req, res) => {
+app.put(':/id', async (req, res) => {
   let editMeme = await Meme.update(req.body,
     {where: {id: req.params.id}});
   res.send("Updated.");
 })
 //Delete a meme
-router.delete('/:id', async (req,res) =>{
+app.delete('/:id', async (req,res) =>{
   deleteMeme= await Meme.destroy(
       {where: {id: req.params.id}}
   );

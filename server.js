@@ -67,6 +67,12 @@ app.get("/memes", async (req, res, next) => {
 // GET route for single user
 
 // POST route to create a meme
+app.post("/:id/memes/:memeID", async (req, res) => {
+  let user = await User.findByPk(req.params.id);
+  let show = await Show.findByPk(req.params.showID);
+  user.addShow(show);
+  res.json(await user.getShows());
+})
 
 // POST route to create/register a user
 

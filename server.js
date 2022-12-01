@@ -23,18 +23,18 @@ app.get("/users", async (req, res) => {
   res.send(users)
 });
 //View a meme
-app.get('/:id', async (req, res) => {
+app.get('/memes/:id', async (req, res) => {
   const singleMeme = await Meme.findByPk(req.params.id);
   res.json(singleMeme);
 })
 //Edit a meme
-app.put(':/id', async (req, res) => {
+app.put('/memes/:id', async (req, res) => {
   let editMeme = await Meme.update(req.body,
     {where: {id: req.params.id}});
   res.send("Updated.");
 })
 //Delete a meme
-app.delete('/:id', async (req,res) =>{
+app.delete('/memes/:id', async (req,res) =>{
   deleteMeme= await Meme.destroy(
       {where: {id: req.params.id}}
   );
@@ -67,11 +67,9 @@ app.get("/memes", async (req, res, next) => {
 // GET route for single user
 
 // POST route to create a meme
-app.post("/:id/memes/:memeID", async (req, res) => {
-  let user = await User.findByPk(req.params.id);
-  let show = await Show.findByPk(req.params.showID);
-  user.addShow(show);
-  res.json(await user.getShows());
+app.post("/memes", async (req, res) => {
+  let newMeme = await Meme.create(req.body);
+  res.send(await Meme.findAll());
 })
 
 // POST route to create/register a user

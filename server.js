@@ -80,16 +80,37 @@ app.post("/memes", async (req, res) => {
   res.send(await Meme.findAll());
 })
 
+
   
 // POST route to create/register a user
 
+app.post("/restaurants" , async (req, res) => {
+  const memes1 = await Memes.create(req.body);
+  res.json(memes1);
+})
+
+
+// POST route to create/register a user
+app.post("/register", async (req,res)=>{
+  const signMeUp = await SignMeUp.create(req.body);
+  res.json(signMeUp);
+})
 // DELETE route to delete a meme
 
 // DELETE route to delete a user
+app.delete("/user/:id", async (req, res,) => {
+  let deletedUser = user.splice(req.params.id - 1, 1)
+  res.json(deletedUser)
+})
 
 // PUT route to update a meme
 
 // PUT route to update a user
+app.put("register/:id", (req, res) => {
+  users[req.params.id - 1].name = "keagan"
+  users[req.params.id - 1].age = 21
+  res.json(users)
+})
 
  // //Creating a register route
 // app.post('/register', async (req,res,next) => {

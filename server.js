@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const bcrypt = require("bcrypt");
 const cors = require("cors");
+var Jwt = require('express-jwt');
 
 const { database } = require('./db');
 
@@ -16,8 +17,24 @@ const port = 3200;
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
+//Middleware 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+//Custom middleware
+//Authorizing user with jwt token
+let authUser = async (req, res, next) => {
+  const auth = req.header("Authorization");
+  if(!auth){
+    console.log("User is not authorized!");
+    next();
+  } else {
+    console.log("User is authorized!");
+    const [, token] = auth.split(" ");
+    const user = jwt.verify(token, JWT_SECRET);
+    next();
+  }
+}
 
 app.get("/", (req, res) => {
   res.send("Sucess!!!!!!!!!!!!");
@@ -105,30 +122,44 @@ app.put("users/:id", async (req, res) => {
 
 //Creating a register route
 app.post("/register", async (req, res, next) => {
-  const { username, password } = req.body;
+  const { first_name, last_name, username, password } = req.body;
   const hashedPw = await bcrypt.hash(password, SALT_COUNT);
-  const user = await User.create({ username, password: hashedPw });
+  const user = await User.create({ first_name, last_name, username, password: hashedPw });
   const token = jwt.sign({ id: user.id, username }, process.env.JWT_SECRET);
   res.send("Thanks for registering! You can log in now.");
 });
 
 //Creating a log in route
-app.post("/login", async (req, res, next) => {
+app.post("/login", authUser, async (req, res, next) => {
   const { username, password } = req.body;
   const foundUser = await User.findOne({ where: { username: username } });
   if (!foundUser) {
     res.send("User not found");
   }
   if (foundUser) {
-    const isMatch = await bcrypt.compare(password, foundUser.password);
+    const isMatch = bcrypt.compareSync(password, foundUser.password);
     if (isMatch) {
       const token = jwt.sign(username, process.env.JWT_SECRET);
-      res.send("You are now logged in successfully");
+      res.send({message: "You are now logged in", token});
     } else {
       res.send("Failed login. Try again");
     }
   }
 });
+
+// var jwtCheck = Jwt({
+//   secret: 'fq1Cw14avEya7mk8lwGLadgOectgPnUp',
+//   audience: 'https://meme4me',
+//   issuer: 'https://dev-1rt78v4rb6srtnzd.us.auth0.com/'
+// });
+
+// // enforce on all endpoints
+// app.use(jwtCheck);
+
+// app.get('/authorized', function (req, res) {
+//     res.send('Secured Resource');
+// });
+
 
 app.listen(port, () => {
   database.sync({ force: false });

@@ -6,7 +6,7 @@ const cors = require("cors");
 
 const { database } = require('./db');
 
-const { seed } = require("./data/seed");
+//const { seed } = require("./data/seed");
 const { Meme } = require("./models/Meme");
 const { User } = require("./models/User");
 

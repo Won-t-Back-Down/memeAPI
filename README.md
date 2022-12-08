@@ -2,7 +2,7 @@
 
 Welcome to Meme4Me, an API for memes!
 
-The premise for the project is that it will be an Instagram for memes. 
+The premise for the project is that it will be an "Instagram for memes". 
 Once registered and logged in, users will be able to view, upload, edit, and/or delete memes to a database that will be shared with other users.
 Users can also filter/search for memes based on a variety of tags.
 

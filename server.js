@@ -35,8 +35,10 @@ app.put("/memes/:id", async (req, res) => {
 });
 
 //Delete a meme
-app.delete("/memes/:id", async (req, res) => {
-  deleteMeme = await Meme.destroy({ where: { id: req.params.id } });
+app.delete('/memes/:id', async (req,res) =>{
+  deleteMeme= await Meme.destroy(
+      {where: {id: req.params.id}}
+  );
   res.send("Deleted.");
 });
 

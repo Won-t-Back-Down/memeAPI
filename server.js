@@ -6,7 +6,7 @@ const cors = require("cors");
 
 const { database } = require('./db');
 
-const { seed } = require("./data/seed");
+//const { seed } = require("./data/seed");
 const { Meme } = require("./models/Meme");
 const { User } = require("./models/User");
 
@@ -98,7 +98,7 @@ app.delete("/user/:id", async (req, res) => {
 });
 
 // PUT route to update a user
-app.put("register/:id", async (req, res) => {
+app.put("users/:id", async (req, res) => {
   let editUser = await User.update(req.body, { where: { id: req.params.id } });
   res.send("Updated.");
 });

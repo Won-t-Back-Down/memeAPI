@@ -9,11 +9,11 @@ const User = database.define("user", {
     },
     first_name: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
     },
     last_name: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
     }, 
     username: {
         type: Sequelize.STRING,

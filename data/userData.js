@@ -21,7 +21,7 @@ const users = [
     last_name: "Frank",
     username: "FrankyF",
     password: "12345",
-    isAdmin: false
+    isAdmin: true
 }
 ];
 

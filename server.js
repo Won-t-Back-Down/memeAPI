@@ -8,8 +8,8 @@ var Jwt = require('express-jwt');
 const { database } = require('./db');
 
 //const { seed } = require("./data/seed");
-const { Meme } = require("./models/Meme");
-const { User } = require("./models/User");
+const { Meme } = require("./models/index");
+const { User } = require("./models/index");
 
 const SALT_COUNT = 9;
 const app = express();
@@ -62,6 +62,12 @@ app.get("/memes/:id", async (req, res) => {
   res.send(await Meme.findByPk(req.params.id));
 });
 
+// GET route to view a meme's associated data (user/creator info)
+app.get("/memes/:id/info", async (req, res) => {
+  const meme = await Meme.findByPk(req.params.id);
+  res.send(await meme.getUser());
+});
+
 // GET route to view all memes and filter for a certain tag
 app.get("/memes", async (req, res, next) => {
   try {
@@ -88,13 +94,33 @@ app.get("/users", async (req, res) => {
 
 // GET route for single user
 app.get("/users/:id", async (req, res) => {
-  res.send(await Users.findByPk(req.params.id));
+  res.send(await User.findByPk(req.params.id));
+});
+
+// POST route to create a meme
+app.get("/users/:id/memes", async (req, res) => {
+  let user = await User.findByPk(req.params.id);
+  res.send(await user.getMemes());
 });
 
 // POST route to create a meme
 app.post("/memes", async (req, res) => {
   let newMeme = await Meme.create(req.body);
   res.send(await Meme.findAll());
+});
+
+// POST route for a user to create meme
+app.post("/users/:id/memes", async (req, res) => {
+  const foundUser = await User.findByPk(req.params.id);
+  const newMeme = await Meme.create(req.body);
+  await foundUser.addMeme(newMeme.id);
+  res.send(await foundUser.getMemes());
+});
+
+// GET route for all of a single user's memes
+app.get("/users/:id/memes", async (req, res) => {
+  let user = await User.findByPk(req.params.id);
+  res.send(user.getMemes)
 });
 
 // app.post("/memes" , async (req, res) => {
@@ -124,7 +150,7 @@ app.put("users/:id", async (req, res) => {
 app.post("/register", async (req, res, next) => {
   const { first_name, last_name, username, password } = req.body;
   const hashedPw = await bcrypt.hash(password, SALT_COUNT);
-  const user = await User.create({ first_name, last_name, username, password: hashedPw });
+  const user = await User.create({ first_name, last_name, username, password: hashedPw, isAdmin: false });
   const token = jwt.sign({ id: user.id, username }, process.env.JWT_SECRET);
   res.send("Thanks for registering! You can log in now.");
 });

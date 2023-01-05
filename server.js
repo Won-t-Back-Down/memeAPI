@@ -37,7 +37,7 @@ let authUser = async (req, res, next) => {
 }
 
 app.get("/", (req, res) => {
-  res.send("Sucess!!!!!!!!!!!!");
+  res.send("Welcome to Meme4Me");
 });
 
 // app.get("/memes", async (req, res) => {

@@ -137,13 +137,13 @@ app.get("/users/:id/memes", async (req, res) => {
 // })
 
 // DELETE route to delete a user
-app.delete("/user/:id", async (req, res) => {
+app.delete("/users/:id", async (req, res) => {
   let deletedUser = user.splice(req.params.id - 1, 1);
   res.json(deletedUser);
 });
 
 // PUT route to update a user
-app.put("users/:id", async (req, res) => {
+app.put("/users/:id", async (req, res) => {
   let editUser = await User.update(req.body, { where: { id: req.params.id } });
   res.send("Updated.");
 });

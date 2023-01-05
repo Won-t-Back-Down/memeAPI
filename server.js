@@ -10,6 +10,7 @@ const { database } = require('./db');
 //const { seed } = require("./data/seed");
 const { Meme } = require("./models/index");
 const { User } = require("./models/index");
+const { users } = require("./data/userData");
 
 const SALT_COUNT = 9;
 const app = express();
@@ -138,7 +139,9 @@ app.get("/users/:id/memes", async (req, res) => {
 
 // DELETE route to delete a user
 app.delete("/users/:id", async (req, res) => {
-  let deletedUser = user.splice(req.params.id - 1, 1);
+  deletedUser= await User.destroy(
+    {where: {id: req.params.id}}
+);
   res.json(deletedUser);
 });
 

@@ -14,6 +14,8 @@ const JWT_SECRET = process.env.JWT_SECRET;
 let seed = async () => {
     await database.sync({force:true});
 
+    let memeEntries = await Meme.bulkCreate(memes);
+
     // Create the entries for them in their Models
     for (let user of users) {
         const { first_name, last_name, username, password, isAdmin } = user;
@@ -21,8 +23,6 @@ let seed = async () => {
         const newUser = await User.create({ first_name, last_name, username, password: hashedPw, isAdmin });
         const token = jwt.sign({ id: newUser.id, username }, process.env.JWT_SECRET);
     }
-
-    let memeEntries = await Meme.bulkCreate(memes);
 
     // let firstMeme = await memeEntries[0];
     // let secondUser = await userEntries[1];

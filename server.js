@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const bcrypt = require("bcrypt");
 const cors = require("cors");
-var Jwt = require('express-jwt');
+const Jwt = require('express-jwt');
 
 const { database } = require('./db');
 
@@ -178,18 +178,19 @@ app.post("/login", authUser, async (req, res, next) => {
   }
 });
 
-// var jwtCheck = Jwt({
-//   secret: 'fq1Cw14avEya7mk8lwGLadgOectgPnUp',
-//   audience: 'https://meme4me',
-//   issuer: 'https://dev-1rt78v4rb6srtnzd.us.auth0.com/'
-// });
+var jwtCheck = Jwt({
+  secret: 'fq1Cw14avEya7mk8lwGLadgOectgPnUp',
+  audience: 'https://meme4me',
+  issuer: 'https://dev-1rt78v4rb6srtnzd.us.auth0.com/',
+  algorithms: ['RS256']
+});
 
-// // enforce on all endpoints
-// app.use(jwtCheck);
+// enforce on all endpoints
+app.use(jwtCheck);
 
-// app.get('/authorized', function (req, res) {
-//     res.send('Secured Resource');
-// });
+app.get('/authorized', function (req, res) {
+    res.send('Secured Resource');
+});
 
 
 app.listen(port, () => {

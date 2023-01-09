@@ -11,6 +11,7 @@ const { database } = require('./db');
 const { Meme } = require("./models/index");
 const { User } = require("./models/index");
 const { users } = require("./data/userData");
+const { auth } = require("express-openid-connect");
 
 const SALT_COUNT = 9;
 const app = express();
@@ -29,11 +30,13 @@ let authUser = async (req, res, next) => {
   if(!auth){
     console.log("User is not authorized!");
     next();
+    return false;
   } else {
     console.log("User is authorized!");
     const [, token] = auth.split(" ");
     const user = jwt.verify(token, JWT_SECRET);
     next();
+    return true;
   }
 }
 
@@ -138,11 +141,15 @@ app.get("/users/:id/memes", async (req, res) => {
 // })
 
 // DELETE route to delete a user
-app.delete("/users/:id", async (req, res) => {
-  deletedUser= await User.destroy(
-    {where: {id: req.params.id}}
-);
-  res.json(deletedUser);
+app.delete("/users/:id", authUser, async (req, res) => {
+  console.log(authUser());
+  if(authUser)
+  {
+    // deletedUser= await User.destroy(
+    //   {where: {id: req.params.id}}
+    // );
+    // res.json(User.findAll());
+  }
 });
 
 // PUT route to update a user
@@ -182,7 +189,7 @@ var jwtCheck = Jwt({
   secret: 'fq1Cw14avEya7mk8lwGLadgOectgPnUp',
   audience: 'https://meme4me',
   issuer: 'https://dev-1rt78v4rb6srtnzd.us.auth0.com/',
-  algorithms: ['RS256']
+  algorithms: ['HS256', 'HS384', 'HS512', 'PS256', 'PS384']
 });
 
 // enforce on all endpoints

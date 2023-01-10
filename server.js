@@ -30,13 +30,11 @@ let authUser = async (req, res, next) => {
   if (!auth) {
     console.log("User is not authorized!");
     next();
-    return false;
   } else {
     console.log("User is authorized!");
     const [, token] = auth.split(" ");
     req.user = jwt.verify(token, JWT_SECRET);
     next();
-    return true;
   }
 };
 
@@ -51,7 +49,9 @@ app.get("/", (req, res) => {
 
 //Edit a meme
 app.put("/memes/:id", authUser, async (req, res) => {
-  if (!req.user && req.user.id != req.params.id) {
+  const meme = await Meme.findByPk(req.params.id);
+  const user = await meme.getUser();
+  if (req.user && req.user.id != user.id) {
     res.send("You tryna Find Out ?");
   } else {
     let editMeme = await Meme.update(req.body, {
@@ -65,11 +65,11 @@ app.put("/memes/:id", authUser, async (req, res) => {
 app.delete("/memes/:id", authUser, async (req, res) => {
   const meme = await Meme.findByPk(req.params.id);
   const user = await meme.getUser();
-  if (req.user && req.user.id == user.id) {
+  if (req.user && req.user.id === user.id) {
     deleteMeme = await Meme.destroy({ where: { id: req.params.id } });
     res.send("Deleted.");
   } else {
-    res.send("unauthorized User");
+    res.send("AW HELL NAW");
   }
 });
 

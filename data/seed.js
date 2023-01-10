@@ -31,10 +31,18 @@ let seed = async () => {
   }
 
   let firstMeme = await Meme.findByPk(1);
+  let secondMeme = await Meme.findByPk(2);
+  let thirdMeme = await Meme.findByPk(3);
+  let fourthMeme = await Meme.findByPk(4);
   let bobby = await User.findByPk(1);
+  let billy = await User.findByPk(2);
+  let franky = await User.findByPk(3);
 
-  //  await firstMeme.setUser(bobby)
   await bobby.addMeme(firstMeme);
+  await bobby.addMeme(secondMeme);
+  await billy.addMeme(thirdMeme);
+  await franky.addMeme(fourthMeme);
+
   // console.log("Test 1: ", firstMeme);
   // console.log("Test 2: ", secondUser);
 

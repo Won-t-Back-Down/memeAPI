@@ -25,6 +25,7 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-jwt": "^6.1.2",
+    "express-openid-connect": "^2.11.0",
     "jsonwebtoken": "^8.5.1",
     "node": "^19.2.0",
     "sequelize": "^6.26.0",

@@ -58,8 +58,16 @@ app.put("/memes/:id", authUser, async (req, res) => {
       where: { id: req.params.id },
     });
     res.send("Updated.");
+    console.log(req.user);
+    console.log(req.user.id);
   }
 });
+
+//{
+//   "caption": "Troll Face 2.0",
+//   "tags": "classico",
+//   "image": "pictureeeee"
+// }
 
 //Delete a meme
 app.delete("/memes/:id", authUser, async (req, res) => {

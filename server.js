@@ -3,14 +3,15 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const bcrypt = require("bcrypt");
 const cors = require("cors");
-var Jwt = require('express-jwt');
+const Jwt = require("express-jwt");
 
-const { database } = require('./db');
+const { database } = require("./db");
 
 //const { seed } = require("./data/seed");
 const { Meme } = require("./models/index");
 const { User } = require("./models/index");
 const { users } = require("./data/userData");
+const { auth } = require("express-openid-connect");
 
 const SALT_COUNT = 9;
 const app = express();
@@ -18,7 +19,7 @@ const port = 3200;
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-//Middleware 
+//Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -26,16 +27,16 @@ app.use(express.urlencoded({ extended: true }));
 //Authorizing user with jwt token
 let authUser = async (req, res, next) => {
   const auth = req.header("Authorization");
-  if(!auth){
+  if (!auth) {
     console.log("User is not authorized!");
     next();
   } else {
     console.log("User is authorized!");
     const [, token] = auth.split(" ");
-    const user = jwt.verify(token, JWT_SECRET);
+    req.user = jwt.verify(token, JWT_SECRET);
     next();
   }
-}
+};
 
 app.get("/", (req, res) => {
   res.send("Welcome to Meme4Me");
@@ -47,17 +48,29 @@ app.get("/", (req, res) => {
 // });
 
 //Edit a meme
-app.put("/memes/:id", async (req, res) => {
-  let editMeme = await Meme.update(req.body, { where: { id: req.params.id } });
-  res.send("Updated.");
+app.put("/memes/:id", authUser, async (req, res) => {
+  const meme = await Meme.findByPk(req.params.id);
+  const user = await meme.getUser();
+  if (req.user && req.user.id != user.id) {
+    res.send("You tryna Find Out ?");
+  } else {
+    let editMeme = await Meme.update(req.body, {
+      where: { id: req.params.id },
+    });
+    res.send("Updated.");
+  }
 });
 
 //Delete a meme
-app.delete('/memes/:id', async (req,res) =>{
-  deleteMeme= await Meme.destroy(
-      {where: {id: req.params.id}}
-  );
-  res.send("Deleted.");
+app.delete("/memes/:id", authUser, async (req, res) => {
+  const meme = await Meme.findByPk(req.params.id);
+  const user = await meme.getUser();
+  if (req.user && req.user.id === user.id) {
+    deleteMeme = await Meme.destroy({ where: { id: req.params.id } });
+    res.send("Deleted.");
+  } else {
+    res.send("AW HELL NAW");
+  }
 });
 
 // GET route for single meme
@@ -100,30 +113,34 @@ app.get("/users/:id", async (req, res) => {
   res.send(await User.findByPk(req.params.id));
 });
 
-// POST route to create a meme
+//GET route to create a meme
 app.get("/users/:id/memes", async (req, res) => {
   let user = await User.findByPk(req.params.id);
   res.send(await user.getMemes());
 });
 
 // POST route to create a meme
-app.post("/memes", async (req, res) => {
-  let newMeme = await Meme.create(req.body);
-  res.send(await Meme.findAll());
-});
+// app.post("/memes", async (req, res) => {
+//   let newMeme = await Meme.create(req.body);
+//   res.send(await Meme.findAll());
+// });
 
 // POST route for a user to create meme
-app.post("/users/:id/memes", async (req, res) => {
-  const foundUser = await User.findByPk(req.params.id);
-  const newMeme = await Meme.create(req.body);
-  await foundUser.addMeme(newMeme.id);
-  res.send(await foundUser.getMemes());
+app.post("/users/:id/memes", authUser, async (req, res) => {
+  if (!req.user && req.user.id != req.params.id) {
+    res.send("You tryna Find Out ?");
+  } else {
+    const foundUser = await User.findByPk(req.params.id);
+    const newMeme = await Meme.create(req.body);
+    await foundUser.addMeme(newMeme.id);
+    res.send(await foundUser.getMemes());
+  }
 });
 
 // GET route for all of a single user's memes
 app.get("/users/:id/memes", async (req, res) => {
   let user = await User.findByPk(req.params.id);
-  res.send(user.getMemes)
+  res.send(user.getMemes);
 });
 
 // app.post("/memes" , async (req, res) => {
@@ -138,11 +155,14 @@ app.get("/users/:id/memes", async (req, res) => {
 // })
 
 // DELETE route to delete a user
-app.delete("/users/:id", async (req, res) => {
-  deletedUser= await User.destroy(
-    {where: {id: req.params.id}}
-);
-  res.json(deletedUser);
+app.delete("/users/:id", authUser, async (req, res) => {
+  console.log(authUser());
+  if (authUser) {
+    // deletedUser= await User.destroy(
+    //   {where: {id: req.params.id}}
+    // );
+    // res.json(User.findAll());
+  }
 });
 
 // PUT route to update a user
@@ -155,7 +175,13 @@ app.put("/users/:id", async (req, res) => {
 app.post("/register", async (req, res, next) => {
   const { first_name, last_name, username, password } = req.body;
   const hashedPw = await bcrypt.hash(password, SALT_COUNT);
-  const user = await User.create({ first_name, last_name, username, password: hashedPw, isAdmin: false });
+  const user = await User.create({
+    first_name,
+    last_name,
+    username,
+    password: hashedPw,
+    isAdmin: false,
+  });
   const token = jwt.sign({ id: user.id, username }, process.env.JWT_SECRET);
   res.send("Thanks for registering! You can log in now.");
 });
@@ -170,27 +196,30 @@ app.post("/login", authUser, async (req, res, next) => {
   if (foundUser) {
     const isMatch = bcrypt.compareSync(password, foundUser.password);
     if (isMatch) {
-      const token = jwt.sign(username, process.env.JWT_SECRET);
-      res.send({message: "You are now logged in", token});
+      const token = jwt.sign(
+        { username, id: foundUser.id },
+        process.env.JWT_SECRET
+      );
+      res.send({ message: "You are now logged in", token });
     } else {
       res.send("Failed login. Try again");
     }
   }
 });
 
-// var jwtCheck = Jwt({
-//   secret: 'fq1Cw14avEya7mk8lwGLadgOectgPnUp',
-//   audience: 'https://meme4me',
-//   issuer: 'https://dev-1rt78v4rb6srtnzd.us.auth0.com/'
-// });
+var jwtCheck = Jwt({
+  secret: "fq1Cw14avEya7mk8lwGLadgOectgPnUp",
+  audience: "https://meme4me",
+  issuer: "https://dev-1rt78v4rb6srtnzd.us.auth0.com/",
+  algorithms: ["HS256", "HS384", "HS512", "PS256", "PS384"],
+});
 
-// // enforce on all endpoints
-// app.use(jwtCheck);
+// enforce on all endpoints
+app.use(jwtCheck);
 
-// app.get('/authorized', function (req, res) {
-//     res.send('Secured Resource');
-// });
-
+app.get("/authorized", function (req, res) {
+  res.send("Secured Resource");
+});
 
 app.listen(port, () => {
   database.sync({ force: false });

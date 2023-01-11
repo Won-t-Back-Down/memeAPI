@@ -28,6 +28,8 @@
     "express-openid-connect": "^2.11.0",
     "jsonwebtoken": "^8.5.1",
     "node": "^19.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "sequelize": "^6.26.0",
     "sqlite3": "^5.1.2"
   },

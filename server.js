@@ -51,15 +51,14 @@ app.get("/", (req, res) => {
 
 //Edit a meme
 app.put("/memes/:id", authUser, async (req, res) => {
-  if (!req.user && req.user.id != req.params.id) {
-    res.send("You tryna Find Out ?");
-  } else {
-    let editMeme = await Meme.update(req.body, {
-      where: { id: req.params.id },
-    });
-    res.send("Updated.");
-  }
-});
+  const meme = await Meme.findByPk(req.params.id);
+  const user = await meme.getUser();
+  if (!req.user && req.user.id != user.id) {
+    res.send("You tryna Find Out ?");}
+    else{
+  let editMeme = await Meme.update(req.body, { where: { id: req.params.id } });
+  res.send("Updated.");
+}});
 
 //Delete a meme
 app.delete("/memes/:id", authUser, async (req, res) => {

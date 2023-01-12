@@ -16,7 +16,7 @@ How to build and run the project:
     - npm run server-start
   - The server should now be running!
   
-The API is also deployed on https://meme4me.onrender.com
+The API is deployed on https://meme4me.onrender.com
 
 Here is the documentation of example requests that our API accepts:
 https://documenter.getpostman.com/view/23113621/2s8ZDR7RVD

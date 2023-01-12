@@ -18,7 +18,7 @@ How to build and run the project:
   
 The API is deployed on https://meme4me.onrender.com
 
-Here is the documentation of example requests that our API accepts:
+Here is the documentation of example HTTP requests that our API accepts:
 https://documenter.getpostman.com/view/23113621/2s8ZDR7RVD
 
 <img width="1445" alt="image" src="https://user-images.githubusercontent.com/6026227/205164619-7e0efdbc-a1d9-46b0-851b-0cf02b77a41d.png">
